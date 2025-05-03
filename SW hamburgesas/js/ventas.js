@@ -1,51 +1,58 @@
-let finances = JSON.parse(localStorage.getItem('finances')) || {
-    activo: 5000,
-    pasivo: 1000,
-    capital: 4000
-};
+let sales = JSON.parse(localStorage.getItem('ventas')) || [];
 
-let sales = JSON.parse(localStorage.getItem('sales')) || [];
-// Registrar una venta
-try {
-    document.getElementById("form-venta").addEventListener("submit", function (e) {
-        e.preventDefault();
-        let producto = document.getElementById("producto").value;
-        let cantidad = parseInt(document.getElementById("cantidad").value);
-        let precioBase = 0;
-    
-        // Determinar el precio base
-        if (producto === 'hamburguesa') {
-            precioBase = 5.00;
-        } else if (producto === 'cheeseburger') {
-            precioBase = 5.50;
-        } else if (producto === 'veggie') {
-            precioBase = 4.50;
-        }
-    
-        let precioFinal = precioBase;
-    
-        // Personalizar el pedido (añadir o quitar ingredientes)
-        if (document.getElementById("agregarQueso").checked) {
-            precioFinal += 1.00;
-        }
-        if (document.getElementById("agregarBacon").checked) {
-            precioFinal += 1.50;
-        }
-        if (document.getElementById("quitarLechuga").checked) {
-            precioFinal -= 0.50;
-        }
-        if (document.getElementById("quitarTomate").checked) {
-            precioFinal -= 0.50;
-        }
-    
-        let totalVenta = precioFinal * cantidad;
-        sales.push({ producto, cantidad, precioFinal, totalVenta });
-        document.getElementById("total-ventas").textContent = sales.reduce((acc, sale) => acc + sale.totalVenta, 0).toFixed(2);
-        document.getElementById('total-ventas').textContent = '0.00';
-        e.target.reset();
-    
-    });
-} catch (error) {
-    console.log();
+function showSection(section) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(sec => sec.classList.remove('active'));
+    document.getElementById(section).classList.add('active');
 }
 
+document.getElementById("form-venta").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const producto = document.getElementById("producto").value;
+    const cantidad = parseInt(document.getElementById("cantidad").value);
+    let precioBase = 0;
+
+    if (producto === 'hamburguesa') {
+        precioBase = 5.00;
+    } else if (producto === 'cheeseburger') {
+        precioBase = 5.50;
+    } else if (producto === 'veggie') {
+        precioBase = 4.50;
+    }
+
+    let precioFinal = precioBase;
+
+    if (document.getElementById("agregarQueso").checked) {
+        precioFinal += 1.00;
+    }
+    if (document.getElementById("agregarBacon").checked) {
+        precioFinal += 1.50;
+    }
+    if (document.getElementById("quitarLechuga").checked) {
+        precioFinal -= 0.50;
+    }
+    if (document.getElementById("quitarTomate").checked) {
+        precioFinal -= 0.50;
+    }
+
+    const totalVenta = precioFinal * cantidad;
+
+    // Guardar venta
+    const venta = { producto, cantidad, precioFinal, totalVenta };
+    sales.push(venta);
+    localStorage.setItem('ventas', JSON.stringify(sales));
+
+    // Actualizar total
+    const totalAcumulado = sales.reduce((acc, sale) => acc + sale.totalVenta, 0);
+    document.getElementById("total-ventas").textContent = totalAcumulado.toFixed(2);
+
+    const listaVentas = document.getElementById("listaVentas");
+const item = document.createElement("li");
+item.textContent = `${cantidad}x ${producto} - $${totalVenta.toFixed(2)}`;
+listaVentas.appendChild(item);
+
+    // Limpiar formulario
+    e.target.reset();
+    
+});
