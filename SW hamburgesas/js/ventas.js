@@ -41,7 +41,8 @@ try {
         let totalVenta = precioFinal * cantidad;
         sales.push({ producto, cantidad, precioFinal, totalVenta });
         document.getElementById("total-ventas").textContent = sales.reduce((acc, sale) => acc + sale.totalVenta, 0).toFixed(2);
-    
+        document.getElementById('total-ventas').textContent = '0.00';
+        e.target.reset();
     
     });
 } catch (error) {
